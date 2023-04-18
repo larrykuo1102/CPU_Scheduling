@@ -3,6 +3,7 @@
 # include <queue>
 # include <functional>
 # include <chrono>
+# include <algorithm>
 using namespace std ;
 
 struct bigInteger{
