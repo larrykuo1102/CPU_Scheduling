@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+# created by virtualenv automatically
+
+
+*.pcap
+*.pcapng
+/CMakeFiles
