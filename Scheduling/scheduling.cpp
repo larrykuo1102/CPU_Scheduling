@@ -4,6 +4,7 @@
 # include <functional>
 # include <chrono>
 # include <algorithm>
+#include <cmath>
 using namespace std ;
 
 struct bigInteger{
@@ -56,6 +57,12 @@ bigInteger addBigNumberTaskTime( bigInteger time, int & excutionTime ) {
     return time ;
 } // addBigNumberTaskTime
 
+int BigIntegerShift() {
+
+}
+
+
+
 int minusBigNumberTime( bigInteger & time, bigInteger & newtime ) {
     if ( time.second != newtime.second ) {
         return INT32_MAX - time.first + newtime.first ; 
@@ -100,10 +107,10 @@ auto deadline_compare = [](const taskTime& p1, const taskTime& p2) {
 };
 
 auto rate_compare = [](const taskTime& p1, const taskTime& p2) {
-    if ( p1.current*p2.period == p2.current*p1.period ) 
+    if ( p2.period == p2.current ) 
         return p1.index > p2.index ;
 
-    return p1.current*p2.period < p2.current*p1.period ;
+    return p1.period > p2.period ;
 };
 
 auto deadline = [](const taskTime& p1, const taskTime& p2) {
@@ -129,10 +136,11 @@ void Schedule( vector<vector<int> > & task, int & Display, int & type, int & tas
     for ( auto i : task ) {
         availableUtilize += double(i[0])/i[1] ;
     }
-    if ( availableUtilize > 1 ) {
+    if (  availableUtilize > 1 ) {
         cout << 0 << " " << 0 << endl ;
         return ;
     }
+
     vector<taskTime> readylist ; // { index, excutionTime, period, current, deadline}
     taskTime task_current ;
     taskTime task_pre ;
@@ -183,6 +191,11 @@ void Schedule( vector<vector<int> > & task, int & Display, int & type, int & tas
             nextPeriod( readylist[0] ) ;
             pqueue.push( readylist[0] ) ;
             readylist.erase(readylist.begin()+0 ) ;
+            while(bigIntegerCompare(time,readylist[0].deadline) == 0 ) {
+                nextPeriod( readylist[0] ) ;
+                pqueue.push( readylist[0] ) ;
+                readylist.erase(readylist.begin()+0 ) ;
+            } // for
         } // if
         else if ( !readylist.empty()) { // check period condition
             bigInteger temptime = addBigNumberTaskTime( time, task_current.current ) ;
@@ -195,16 +208,21 @@ void Schedule( vector<vector<int> > & task, int & Display, int & type, int & tas
             else {
                 minDeadline = readylist[0].deadline ;
             }
-            for ( int k = 0 ; k < readylist.size() ; k ++ ) {
-                if ( bigIntegerCompare(minDeadline,readylist[k].deadline) == 0  ) {
-                    nextPeriod( readylist[k] ) ;
-                    pqueue.push( readylist[k] ) ;
-                    readylist.erase(readylist.begin()+k ) ;
-                    k -- ;
-                }
-                else
-                    break ;
+            while(bigIntegerCompare(minDeadline,readylist[0].deadline) == 0 ) {
+                nextPeriod( readylist[0] ) ;
+                pqueue.push( readylist[0] ) ;
+                readylist.erase(readylist.begin()+0 ) ;
             } // for
+            // for ( int k = 0 ; k < readylist.size() ; k ++ ) {
+            //     if ( bigIntegerCompare(minDeadline,readylist[k].deadline) == 0  ) {
+            //         nextPeriod( readylist[k] ) ;
+            //         pqueue.push( readylist[k] ) ;
+            //         readylist.erase(readylist.begin()+k ) ;
+            //         k -- ;
+            //     }
+            //     else
+            //         break ;
+            // } // for
             task_current.current = task_current.current - minusBigNumberTime( time, minDeadline ) ; 
             time = minDeadline ;
                 
